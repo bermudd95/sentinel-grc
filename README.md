@@ -1,16 +1,30 @@
-# React + Vite
+# SentinelGRC — AI-Powered Security Assurance Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Sprint 0 - Architecture Complete](https://img.shields.io/badge/Sprint--0-Architecture%20%26%20Governance-blue)
+![Framework Compliance](https://img.shields.io/badge/Compliance-NIST%20CSF%202.0%20%7C%20SP%20800--53-green)
+![AppSec Standard](https://img.shields.io/badge/AppSec-Multi--Tenant%20Logical%20Isolation-orange)
 
-Currently, two official plugins are available:
+SentinelGRC is an enterprise-grade, multi-tenant SaaS security assurance platform designed to automate corporate risk registers, control assessments, and Plan of Action and Milestones (POA&M) tracking. Built with a "Security-First" engineering design, the system enforces cryptographically boundary-checked data governance directly at the database layer to mitigate horizontal privilege escalation vectors.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🏗 System Architecture & Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React, Vite, Tailwind CSS (Single Page Application architecture)
+- **Backend & Storage:** Firebase Auth, Firestore (NoSQL Document Store), Firebase Cloud Storage
+- **Agile Management:** Linked Jira Software (Scrum) & Confluence engineering workspaces
+- **CI/CD & DevSecOps:** GitHub Actions for automated linting, static application security testing (SAST), and hosting deployment
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🔒 Multi-Tenancy & Data Isolation Model
+
+To eliminate cross-tenant data leakage risks in a NoSQL environment, SentinelGRC uses a **Flat Collection Model with Tenant-ID Fields** rather than standard subcollections. Custom Firebase Authentication token claims bind users to specific tenant IDs, which are validated at the edge by Firestore Security Rules before any read or write operation executes:
+
+```javascript
+// Firestore Rule Enforcing Tenant Isolation
+match /risks/{riskId} {
+  allow read, write: if request.auth != null
+                    && request.auth.token.tenantId == resource.data.tenantId;
+}
+```
