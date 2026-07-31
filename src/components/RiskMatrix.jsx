@@ -62,7 +62,7 @@ export const RiskMatrix = ({ risks = [] }) => {
 									marginTop: "0.25rem",
 								}}
 							>
-								{count[key] || 0}
+								{counts[key] || 0}
 							</div>
 						</div>
 					),
