@@ -1,30 +1,63 @@
-# SentinelGRC — AI-Powered Security Assurance Platform
+# 🛡️ SentinelGRC | Multi-Tenant Enterprise Risk & Compliance Engine
 
-![Sprint 0 - Architecture Complete](https://img.shields.io/badge/Sprint--0-Architecture%20%26%20Governance-blue)
-![Framework Compliance](https://img.shields.io/badge/Compliance-NIST%20CSF%202.0%20%7C%20SP%20800--53-green)
-![AppSec Standard](https://img.shields.io/badge/AppSec-Multi--Tenant%20Logical%20Isolation-orange)
-
-SentinelGRC is an enterprise-grade, multi-tenant SaaS security assurance platform designed to automate corporate risk registers, control assessments, and Plan of Action and Milestones (POA&M) tracking. Built with a "Security-First" engineering design, the system enforces cryptographically boundary-checked data governance directly at the database layer to mitigate horizontal privilege escalation vectors.
+> **Architect & Lead Developer:** Danny Bermudez | Cybersecurity Analyst & Blue Team Practitioner
+> **Tech Stack:** React, Firebase/Firestore, Node.js, GitHub Actions (DevSecOps), NIST CSF 2.0 / ISO 27001 Frameworks
 
 ---
 
-## 🏗 System Architecture & Tech Stack
+## 📌 Executive Summary
 
-- **Frontend:** React, Vite, Tailwind CSS (Single Page Application architecture)
-- **Backend & Storage:** Firebase Auth, Firestore (NoSQL Document Store), Firebase Cloud Storage
-- **Agile Management:** Linked Jira Software (Scrum) & Confluence engineering workspaces
-- **CI/CD & DevSecOps:** GitHub Actions for automated linting, static application security testing (SAST), and hosting deployment
+SentinelGRC is a cloud-native Governance, Risk, and Compliance (GRC) platform engineered with a **Zero-Trust AppSec Architecture**. Unlike traditional spreadsheet-based risk registers or vulnerable client-filtered SaaS apps, SentinelGRC enforces strict tenant isolation, automated $Impact \times Likelihood$ risk calculations, and immutable audit logging directly at the database edge.
 
 ---
 
-## 🔒 Multi-Tenancy & Data Isolation Model
+## 🏗️ System Architecture & DevSecOps Pipeline
 
-To eliminate cross-tenant data leakage risks in a NoSQL environment, SentinelGRC uses a **Flat Collection Model with Tenant-ID Fields** rather than standard subcollections. Custom Firebase Authentication token claims bind users to specific tenant IDs, which are validated at the edge by Firestore Security Rules before any read or write operation executes:
+[ Client React Frontend ]
+│ (JWT Auth Token w/ tenantId claim)
+▼
+[ Database Edge Security Rules ]
+├── 🔒 Multi-Tenant Boundary Enforcement (BOLA Defense)
+├── 📊 Automated Risk Engine Payload Validation
+└── 🛑 Immutable Append-Only Audit Logging (/audit_logs)
+│
+▼
+[ GitHub Actions DevSecOps CI/CD ]
+├── 🧪 Firebase Emulator Security Rule Unit Testing
+└── 🔍 Automated SAST & Dependency Vulnerability Scan
 
-```javascript
-// Firestore Rule Enforcing Tenant Isolation
-match /risks/{riskId} {
-  allow read, write: if request.auth != null
-                    && request.auth.token.tenantId == resource.data.tenantId;
-}
+---
+
+## 🚀 Key Features & Sprint Milestones
+
+### 1. Zero-Trust Multi-Tenancy (Sprint 1)
+
+- **JWT Custom Claims:** Binds authenticated users to `tenantId` and `role` claims at login.
+- **Database Edge Isolation:** Rejects unauthorized cross-tenant data requests prior to database query execution.
+
+### 2. Risk Assessment Engine & Real-Time Analytics (Sprint 2)
+
+- **Quantitative Scoring:** Automatically computes risk severity based on a standard $5 \times 5$ matrix ($Impact \times Likelihood$).
+- **Live Dashboard:** Real-time summary displaying active risk distribution across Critical, High, Medium, and Low tiers.
+
+### 3. Compliance Framework Mapping & Immutable Audit Trails (Sprint 3)
+
+- **Framework Integration:** Maps active risks to **NIST CSF 2.0**, **ISO 27001**, and **SOC 2** controls.
+- **Non-Repudiable Logs:** Enforces `allow update, delete: if false;` rules on audit logs to guarantee compliance immutability.
+
+### 4. Automated DevSecOps Pipeline (Sprint 4)
+
+- **Automated Rule Testing:** Runs headless Firebase Emulator unit tests on every pull request to catch BOLA regressions.
+- **SAST & Vulnerability Scanning:** Executes continuous dependency checks via GitHub Actions.
+
+---
+
+## 🧪 Running Security Rule Unit Tests Locally
+
+```bash
+# Install dependencies
+npm ci
+
+# Run Firebase Security Rule unit test suite inside emulator
+npx firebase emulators:exec --only firestore "npm test"
 ```
