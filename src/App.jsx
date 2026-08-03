@@ -1,64 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { RiskMatrix } from "./components/RiskMatrix";
-import { getTenantRisks } from "./services/riskService";
+import React from "react";
 
-// Fallback data so the UI displays immediately during development/demo
-const MOCK_DEMO_RISKS = [
+const SEVERITY_CONFIG = {
+	CRITICAL: { label: "Critical", color: "#ef4444" },
+	HIGH: { label: "High", color: "#f97316" },
+	MEDIUM: { label: "Medium", color: "#eab308" },
+	LOW: { label: "Low", color: "#3b82f6" },
+};
+
+const DEMO_RISKS = [
 	{
 		id: "1",
 		title: "Unencrypted S3 Bucket",
-		impact: 5,
-		likelihood: 4,
-		severity: "Critical",
+		severity: "CRITICAL",
 	},
 	{
 		id: "2",
 		title: "Missing MFA on VPN",
-		impact: 4,
-		likelihood: 3,
-		severity: "High",
+		severity: "HIGH",
 	},
 	{
 		id: "3",
 		title: "Outdated Dependency (CVE-2024-1234)",
-		impact: 3,
-		likelihood: 2,
-		severity: "Medium",
+		severity: "MEDIUM",
 	},
 	{
 		id: "4",
 		title: "Stale IAM User Access Keys",
-		impact: 2,
-		likelihood: 1,
-		severity: "Low",
+		severity: "LOW",
 	},
 ];
 
 export default function App() {
-	const [risks, setRisks] = useState(MOCK_DEMO_RISKS);
-	const [loading, setLoading] = useState(true);
-	const currentTenantId = "tenant_alpha";
-
-	useEffect(() => {
-		const fetchRisks = async () => {
-			try {
-				const data =
-					await getTenantRisks(currentTenantId);
-				if (data && data.length > 0) {
-					setRisks(data);
-				}
-			} catch (err) {
-				console.warn(
-					"Firebase not connected or empty, using demo state:",
-					err.message,
-				);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchRisks();
-	}, [currentTenantId]);
+	const counts = DEMO_RISKS.reduce(
+		(acc, risk) => {
+			const sev = risk.severity;
+			acc[sev] = (acc[sev] || 0) + 1;
+			return acc;
+		},
+		{ CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 },
+	);
 
 	return (
 		<main
@@ -74,7 +54,7 @@ export default function App() {
 				style={{
 					marginBottom: "2rem",
 					borderBottom: "1px solid #334155",
-					pb: "1rem",
+					paddingBottom: "1rem",
 				}}
 			>
 				<h1
@@ -94,20 +74,71 @@ export default function App() {
 					Zero-Trust Multi-Tenant Risk &
 					Compliance Engine | Active Tenant:{" "}
 					<code style={{ color: "#38bdf8" }}>
-						{currentTenantId}
+						tenant_alpha
 					</code>
 				</p>
 			</header>
 
-			<section>
-				{loading ? (
-					<p style={{ color: "#94a3b8" }}>
-						Loading tenant risk register...
-					</p>
-				) : (
-					<RiskMatrix risks={risks} />
-				)}
-			</section>
+			<div
+				style={{
+					padding: "1.5rem",
+					background: "#1e293b",
+					borderRadius: "8px",
+					color: "#fff",
+				}}
+			>
+				<h3
+					style={{
+						marginTop: 0,
+						marginBottom: "1rem",
+					}}
+				>
+					Tenant Risk Overview
+				</h3>
+				<div
+					style={{
+						display: "grid",
+						gridTemplateColumns:
+							"repeat(4, 1fr)",
+						gap: "1rem",
+					}}
+				>
+					{Object.entries(SEVERITY_CONFIG).map(
+						([key, config]) => (
+							<div
+								key={key}
+								style={{
+									padding: "1rem",
+									borderRadius: "6px",
+									backgroundColor:
+										"#0f172a",
+									borderLeft: `4px solid ${config.color}`,
+								}}
+							>
+								<div
+									style={{
+										fontSize:
+											"0.875rem",
+										color: "#94a3b8",
+									}}
+								>
+									{config.label} Risks
+								</div>
+								<div
+									style={{
+										fontSize: "1.75rem",
+										fontWeight: "bold",
+										marginTop:
+											"0.25rem",
+									}}
+								>
+									{counts[key] || 0}
+								</div>
+							</div>
+						),
+					)}
+				</div>
+			</div>
 		</main>
 	);
 }

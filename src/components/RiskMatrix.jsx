@@ -1,5 +1,5 @@
 import React from "react";
-import { SEVERITY_LEVELS } from "../utils/riskCalculator";
+import { SEVERITY_LEVELS } from "../utils/riskCalculator.js";
 
 export const RiskMatrix = ({ risks = [] }) => {
 	const counts = risks.reduce(
