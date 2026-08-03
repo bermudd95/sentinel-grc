@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "jest tests/firestore-rules.test.js --runInBand",
+    "eject": "react-scripts eject",
     "lint": "eslint .",
     "preview": "vite preview"
   },
