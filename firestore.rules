@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for authentication and multi-tenancy
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isTenantUser(tenantId) {
+      return isAuthenticated() && request.auth.token.tenantId == tenantId;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && request.auth.token.role == role;
+    }
+
+    // 🔒 Multi-Tenant Enterprise Risk Register Collection (Sprint 1 & 2)
+    match /risks/{riskId} {
+      // BOLA Defense: Users can only read or delete risks belonging to their assigned tenantId
+      allow read, delete: if isAuthenticated() 
+                          && request.auth.token.tenantId == resource.data.tenantId;
+
+      // Users can only create or update risks tagged with their assigned tenantId
+      allow create, update: if isAuthenticated() 
+                            && request.auth.token.tenantId == request.resource.data.tenantId;
+    }
+
+    // 🛑 Immutable Audit Logs Collection (Sprint 3)
+    match /audit_logs/{logId} {
+      // Tenant users can read audit logs for reporting and compliance
+      allow read: if isTenantUser(resource.data.tenantId);
+
+      // Authenticated tenant users can write/append audit logs
+      allow create: if isTenantUser(request.resource.data.tenantId);
+
+      // 🛑 Strict Immutability Constraint: Updates and deletions are explicitly denied for ALL users
+      allow update, delete: if false;
+    }
+  }
+}
